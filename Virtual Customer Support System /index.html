@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Virtual Support Chat</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="chatbox">
+        <h2>Virtual Support Assistant</h2>
+        <div class="chat" id="chat"></div>
+        <form id="chat-form">
+            <input type="text" id="message" autocomplete="off" placeholder="Ask me anything..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        const chatForm = document.getElementById('chat-form');
+        const chat = document.getElementById('chat');
+
+        chatForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const message = document.getElementById('message').value;
+            chat.innerHTML += `<div class="user"><b>You:</b> ${message}</div>`;
+            document.getElementById('message').value = '';
+
+            const response = await fetch("/ask", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `message=${encodeURIComponent(message)}`
+            });
+
+            const data = await response.json();
+            chat.innerHTML += `<div class="bot"><b>Bot:</b> ${data.response}</div>`;
+            chat.scrollTop = chat.scrollHeight;
+        };
+    </script>
+</body>
+</html>
